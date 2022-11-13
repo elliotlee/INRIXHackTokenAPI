@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css"
+     integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
+     crossorigin=""/>
+     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+     <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"
+     integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg="
+     crossorigin=""></script>
+  </head>
+  <body>
+    
+
+
+    <div id="map" style="width: 100%; height: 40em;"></div>
+    <input readonly id="lat1">,
+    <input readonly id="lng1">
+    <input readonly id="lat2">,
+    <input readonly id="lng2">
+    <button onClick="go()">Go!</button>
+
+<div class="container" >
+    <svg id="svg" height="24">
+        <circle id="greencircle" cx="6"
+            cy="6" r="5" fill="limegreen" stroke="lime"/>
+            <circle id="greencircle" cx="6"
+            cy="18" r="5" fill="salmon" stroke="red"/>
+            <text x="12" y="11">Start</text>
+            <text x="12" y="23">Destination</text>
+
+    </svg>
+</div>
+
+    <div class="container">
+      <table class="table ">
+        <thead>
+          <tr >
+            <th scope="col">*</th>
+            <th scope="col" style= "color:blue"><u>Walk</u></th>
+            <th scope="col" style= "color:red"><u>Bike</u></th>
+            <th scope="col" style= "color:purple"><u>Drive</u></th>
+            <th scope="col" style= "color:green"><u>Transit</u></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Distance</th>
+            <td id="out1"></td>
+            <td id="out2"></td>
+            <td id="out3"></td>
+            <td id="out4"></td>
+          </tr>
+          <tr>
+            <th scope="row">Duration</th>
+            <td id="out5"></td>
+            <td id="out6"></td>
+            <td id="out7"></td>
+            <td id="out8"></td>
+          </tr>
+          <tr>
+            <th scope="row">Cost</th>
+            <td id="out9"></td>
+            <td id="out10"></td>
+            <td id="out11"></td>
+            <td id="out12"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+
+<script>
+  let x1, y1, x2, y2;
+  let dots = 0;
+
+
+  const map = L.map('map').setView([37.75823, -122.43], 13);
+
+  const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+
+
+  const polygon = L.polygon([
+    [37.858,-122.541], [37.858,-122.341], [37.699,-122.341], [37.699,-122.541]
+  ], {fillOpacity: 0} ).addTo(map)
+
+
+  const popup = L.popup()
+    .setLatLng([37.75723, -122.44])
+    .setContent('click two points on the map')
+    .openOn(map);
+
+
+
+  let circle1 = L.circleMarker([0,0], {
+          color: 'lime',
+          fillColor: 'green',
+          fillOpacity: 0.5,
+          radius: 10
+        });  
+  let circle2 = L.circleMarker([0,0], {
+          color: 'red',
+          fillColor: '#f55',
+          fillOpacity: 0.5,
+          radius: 10
+        });
+
+  function onMapClick(e) {
+
+      // popup
+      //   .setLatLng(e.latlng)
+      //   .setContent(`${e.latlng.lat}, ${e.latlng.lng}`)
+      //   .openOn(map);
+
+      if(dots == 0) {
+        circle1.setLatLng(e.latlng);
+        circle1.addTo(map).bindPopup('pt1');
+
+        x1 = e.latlng.lat;
+        y1 = e.latlng.lng;
+
+        let x1doc = document.getElementById("lat1");
+        let y1doc = document.getElementById("lng1");
+        x1doc.value = x1;
+        y1doc.value = y1;
+
+      }
+      if(dots == 1) {
+        circle2.setLatLng(e.latlng);
+        circle2.addTo(map).bindPopup('pt2');
+
+        x2 = e.latlng.lat;
+        y2 = e.latlng.lng;
+
+        let x2doc = document.getElementById("lat2");
+        let y2doc = document.getElementById("lng2");
+        x2doc.value = x2;
+        y2doc.value = y2;
+      }
+
+      if(dots>=2) {
+        if(dots%2==0) {
+          circle1.setLatLng(e.latlng);
+          x1 = e.latlng.lat;
+          y1 = e.latlng.lng;
+          let x1doc = document.getElementById("lat1");
+          let y1doc = document.getElementById("lng1");
+          x1doc.value = x1;
+          y1doc.value = y1;
+        }
+        else if(dots%2 ==1) {
+          circle2.setLatLng(e.latlng);
+          x2 = e.latlng.lat;
+          y2 = e.latlng.lng;
+          let x2doc = document.getElementById("lat2");
+          let y2doc = document.getElementById("lng2");
+          x2doc.value = x2;
+          y2doc.value = y2;
+        }
+      }
+
+      dots++;
+  
+  }
+
+  map.on('click', onMapClick);
+
+  function go()
+  {
+    doEverythingElse(x1, y1, x2, y2)
+  }
+
+  function doEverythingElse(x1,y1,x2,y2)
+  {
+    let out1 = document.getElementById("out1")
+    
+
+    let output = document.getElementById("output")
+        let carDistance = 0;
+        let carTime = 0;
+        let carCost = 0;
+        let bikeDistance = 0;
+        let bikeTime = 0;
+        let walkDistance = 0;
+        let walkTime = 0;
+        let transitDistance = 0;
+        let transitTime = 0;
+        let transitCost = 0;
+        let gasMileage = 18;
+
+        //http://localhost:8000/getgooglex1=" + wp1x 
+        var apiUrl = 'http://localhost:8000/gettoken';
+        fetch(apiUrl).then(response => {
+          return response.json();
+        }).then(data => {
+          // Work with JSON data here
+            
+            //console.log(data.token);
+            let authStr = "Bearer%" + data.token;
+            
+
+            let wp1x = x1
+            let wp1y = y1
+            let wp2x = x2
+            let wp2y = y2
+            
+            var currentURL = "https://api.iq.inrix.com/findRoute?wp_1=" + wp1x + "%2C" + wp1y + "&wp_2=" + wp2x + "%2C" + wp2y + "&format=json\n"
+
+
+            var incidentURL = "https://incident-api.inrix.com/v1/incidents?box=" + wp1x + "|"+ wp1y +"," + wp2x + "|" + wp2y + "&incidentType=Incidents,Flow,Construction&incidentoutputfields=all\n"
+            
+            var myHeaders = new Headers();
+            myHeaders.append("Authorization", "Bearer " + data.token);
+
+            var requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+            };
+
+            fetch(currentURL, requestOptions)
+            .then(response => response.json())
+            .then(json => {
+                console.log(json)
+
+                carDistance = json.result.trip.routes[0].totalDistance;
+                carTime = json.result.trip.routes[0].travelTimeMinutes;
+                carCost = Math.round(100 * ((carDistance * (1/gasMileage) * 6.016) + 5 ))/100
+                
+                
+                
+                var bikeUrl = "http://localhost:8000/getbike?x1=" + wp1x + "&y1=" + wp1y + "&x2=" + wp2x + "&y2=" + wp2y;
+                fetch(bikeUrl).then(response => {
+                    return response.json();
+                }).then(data => {
+
+                    bikeDistance = data[0].legs[0].distance.text
+                    bikeTime = data[0].legs[0].duration.text
+                    
+                    let length = data[0].legs[0].steps.length;
+                       var latlngs = Array.from(Array(length), () => new Array(2));
+
+                       for(let i = 0; i<length; i++) {
+                          latlngs[i][0] = data[0].legs[0].steps[i].start_location.lat;
+                          latlngs[i][1] = data[0].legs[0].steps[i].start_location.lng;
+
+                        }
+                        latlngs[length-1][0] = data[0].legs[0].steps[length-1].end_location.lat;
+                        latlngs[length-1][1] = data[0].legs[0].steps[length-1].end_location.lng;
+
+                        var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+
+
+
+                    var walkUrl = "http://localhost:8000/getwalk?x1=" + wp1x + "&y1=" + wp1y + "&x2=" + wp2x + "&y2=" + wp2y;
+                    fetch(walkUrl).then(response => {
+                        return response.json();
+                    }).then(data => {
+
+                        walkDistance = data[0].legs[0].distance.text;
+                        walkTime = data[0].legs[0].duration.text;
+
+                        let length = data[0].legs[0].steps.length;
+                        var latlngs = Array.from(Array(length), () => new Array(2));
+
+                       for(let i = 0; i<length; i++) {
+                          latlngs[i][0] = data[0].legs[0].steps[i].start_location.lat;
+                          latlngs[i][1] = data[0].legs[0].steps[i].start_location.lng;
+
+                        }
+                        latlngs[length-1][0] = data[0].legs[0].steps[length-1].end_location.lat;
+                        latlngs[length-1][1] = data[0].legs[0].steps[length-1].end_location.lng;
+                        
+                        out1.innerText = walkDistance
+                        out2.innerText = bikeDistance
+                        out3.innerText = carDistance + " mi"
+                       
+                        out5.innerText = walkTime
+                        out6.innerText = bikeTime
+                        out7.innerText = carTime  + " mins"
+                        
+                        out9.innerText =  "$0"
+                        out10.innerText = "$0"
+                        out11.innerText = "$" + carCost
+
+                        out4.innerText = "-"
+                        out8.innerText = "-"
+                        out12.innerText = "-"
+                        
+                        var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+
+                        
+
+                        var transitUrl = "http://localhost:8000/gettransit?x1=" + wp1x + "&y1=" + wp1y + "&x2=" + wp2x + "&y2=" + wp2y;
+                        fetch(transitUrl).then(response => {
+                            return response.json();
+                        }).then(data => {
+
+                            transitDistance = data[0].legs[0].distance.text
+                            transitTime = data[0].legs[0].duration.text
+                            transitCost = data[0].fare.text
+
+                            let length = data[0].legs[0].steps.length;
+                            var latlngs = Array.from(Array(length), () => new Array(2));
+
+                            for(let i = 0; i<length; i++) {
+                                latlngs[i][0] = data[0].legs[0].steps[i].start_location.lat;
+                                latlngs[i][1] = data[0].legs[0].steps[i].start_location.lng;
+
+                            }
+                            latlngs[length-1][0] = data[0].legs[0].steps[length-1].end_location.lat;
+                            latlngs[length-1][1] = data[0].legs[0].steps[length-1].end_location.lng;
+
+                            var polyline = L.polyline(latlngs, {color: 'green'}).addTo(map);
+
+
+                            out4.innerText = transitDistance
+                            out8.innerText = transitTime
+                            out12.innerText = transitCost
+
+
+
+                            var driveUrl = "http://localhost:8000/getdrive?x1=" + wp1x + "&y1=" + wp1y + "&x2=" + wp2x + "&y2=" + wp2y;
+                            fetch(driveUrl).then(response => {
+                                return response.json();
+                            }).then(data => {
+
+                                let length = data[0].legs[0].steps.length;
+                                var latlngs = Array.from(Array(length), () => new Array(2));
+
+                               for(let i = 0; i<length; i++) {
+                                  latlngs[i][0] = data[0].legs[0].steps[i].start_location.lat;
+                                  latlngs[i][1] = data[0].legs[0].steps[i].start_location.lng;
+
+                                }
+                                latlngs[length-1][0] = data[0].legs[0].steps[length-1].end_location.lat;
+                                latlngs[length-1][1] = data[0].legs[0].steps[length-1].end_location.lng;
+                                
+                                var polyline = L.polyline(latlngs, {color: 'purple'}).addTo(map);
+                              }).then(data => {
+
+                            fetch(incidentURL, requestOptions)
+                            .then(response => response.json())
+                            .then(json => {
+                                console.log(json)
+                              }
+                              )
+                    
+
+                            console.log(carDistance);
+                            console.log(carTime);
+                            console.log(carCost);
+                            console.log(bikeDistance)
+                            console.log(bikeTime)
+                            console.log(walkDistance);
+                            console.log(walkTime);
+                            console.log(transitDistance)
+                            console.log(transitTime)
+                            console.log(transitCost)
+
+
+
+                            
+
+
+                }).catch(err => {
+                    
+                });
+
+
+
+
+
+
+
+
+                    }).catch(err => {
+                        alert("walk error")
+                    });
+                }).catch(err => {
+                    alert("bike error")
+                });
+
+
+                /*
+                var googleUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + wp1x + "%2C" + wp1y + "&destination=" + wp2x + "%2C" + wp2y + "&mode=bicycling"
+                var googleHeaders = new Headers();
+                googleHeaders.append("Authorization", "AIzaSyDB8n-0BWGGHjmWlYpWSGpvWa-M-f5F8BU");
+                googleHeaders.append('Access-Control-Allow-Origin', 'http://localhost:3000');
+                googleHeaders.append('Access-Control-Allow-Credentials', 'true');
+
+                var googleOptions = {
+                method: 'GET',
+                headers: googleHeaders,
+                redirect: 'follow'
+                };
+
+                fetch(googleUrl, googleOptions)
+                }).then(data => {
+                    console.log("hit")
+                    //json.routes[0].legs[0].duration.text;
+                }).catch(err => {
+                alert("google error")
+                */
+            }).catch(err => {
+                alert("inrix api error")
+            })
+                
+        }).catch(err => {
+          alert("token error")
+        });
+  }
+
+
+  map.on('click', onMapClick);
+
+</script>
+  </body>
+</html>
