@@ -6,7 +6,7 @@
      crossorigin=""/>
      <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>Routeabaga</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
      <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"
      integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg="
@@ -15,21 +15,28 @@
   <body>
     
 
-    <div class="row justify-content-center">
+    <div class="">
       <div id="map" style="width: 100%; height: 35em;"></div>
-      <div class="col ">
-        <input readonly id="lat1">,
-        <input readonly id="lng1">
-        <input readonly id="lat2">,
-        <input readonly id="lng2">
-        <input id="mpg" value="20">mpg</input>
-        <button onClick="go()">Go!</button>
+      <div class="row justify-content-around">
+        <div class="col ms-5">
+          <input readonly id="lat1" size="15">,
+          <input readonly id="lng1" size="15">
+        </div>
+        <div class="col">
+          <input readonly id="lat2" size="15">,
+          <input readonly id="lng2" size="15">
+        </div>
+        <div class="col">
+          <input id="mpg" value="20" size="10">mpg</input>
+          <button onClick="go()">Go!</button>
+        </div>
+      </div>
       </div>
     </div>
 <div class="row " >
     <div class="col-1">
       <svg id="svg" height="70">
-        <circle id="bluecircle" cx="35"
+            <circle id="bluecircle" cx="35"
             cy="22" r="5" fill="blue" stroke="blue"/>
             <circle id="yellowcircle" cx="35"
             cy="35" r="5" fill="yellow" stroke="yellow"/>
