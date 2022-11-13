@@ -196,7 +196,7 @@
     let output = document.getElementById("output")
         let carDistance = 0;
         let carTime = 0;
-        let carCost = 0;
+        let carCost = 2;
         let bikeDistance = 0;
         let bikeTime = 0;
         let walkDistance = 0;
@@ -226,11 +226,7 @@
             var currentURL = "https://api.iq.inrix.com/findRoute?wp_1=" + wp1x + "%2C" + wp1y + "&wp_2=" + wp2x + "%2C" + wp2y + "&format=json\n"
 
 
-            // var fuelURL = "https://fuel-api.inrix.com/v1/fuelstations/?box=" + wp1x + "|"+ wp1y +"," + wp2x + "|" + wp2y + "&radius=1&accesstoken={"+token+"}";
-            //var incidentURL = "https://incident-api.inrix.com/v1/incidents?box=" + wp1x + "|"+ wp1y +"," + wp2x + "|" + wp2y + "&incidentType=Incidents,Flow,Construction&incidentoutputfields=all\n"
 
-             // var incidentURL = "https://api.iq.inrix.com/v1/incidents?box=" + wp1x + "%7C" + wp1y + "%2C" + wp2x + "%7C" + wp2y + "&incidentoutputfields=All&incidenttype=Incidents,Flow,Construction&locale=en"
-            
             var myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer " + data.token);
 
@@ -247,7 +243,7 @@
 
                 carDistance = json.result.trip.routes[0].totalDistance;
                 carTime = json.result.trip.routes[0].travelTimeMinutes;
-                carCost = Math.round(100 * ((carDistance * (1/gasMileage) * 6.016) + 5 ))/100;
+                // carCost = Math.round(100 * ((carDistance * (1/gasMileage) * 6.06) + 5 ))/100;
                 
                 
                 var incidentURL = "https://api.iq.inrix.com/v1/incidents?box=" + wp1x + "%7C" + wp1y + "%2C" + wp2x + "%7C" + wp2y + "&incidentoutputfields=All&incidenttype=Incidents,Flow,Construction&locale=en"
@@ -261,12 +257,14 @@
                 let length = json.result.incidents.length;
                 var incidents = Array.from(Array(length), () => new Array(2));
                 var sev;
+                let set = new Set();
                 
                 for(let i = 0; i<length; i++) {
                   incidents[i][0] = json.result.incidents[i].geometry.coordinates[1];
                   //console.log(json.result.incidents[i].geometry.coordinates)
                   incidents[i][1] = json.result.incidents[i].geometry.coordinates[0];
                   sev = json.result.incidents[i].severity;
+                  set.add(sev);
                   //console.log("Dfgkjdfkgjdlkfg"+incidents[i]);
 
                   if(sev==4) {
@@ -277,6 +275,7 @@
                       radius:8
                     });  
                     circle.addTo(map);
+
                   }
                   else if(sev==3) {
                     let circle = L.circleMarker(incidents[i], {
@@ -291,7 +290,7 @@
                     let circle = L.circleMarker(incidents[i], {
                       color: 'yellow',
                       fillColor: 'yellow',
-                      fillOpacity: 1,
+                      fillOpacity: 0.5,
                       radius: 2
                     });  
 
@@ -312,10 +311,62 @@
                   }
                 }
 
+                set.forEach(element => {
+                  console.log("element: "+element);
+                  if(element == 4) {
+                    alert("Traffic Incident: Crash and Hazard")
+                  }
+                  if(element == 3) {
+                    alert("Traffic Incident: Congestion")
+                  }
+                  if(element == 2) {
+                    alert("Traffic Incident: Event")
+                  }
+                  if(element == 1) {
+                    alert("Traffic Incident: Construction")
+                  }
+
+                }
+                )
 
 
               })
 
+
+                var fuelURL = "https://api.iq.inrix.com/v1/fuelStations?point="+ (wp1x+wp2x)/2 +"%7c"+(wp1y+wp2y)/2 + "&radius=2&accesstoken="+token;
+
+                fetch(fuelURL, requestOptions)
+                .then(response => response.json())
+                .then(json => {
+                    console.log(json)
+
+                    let length = json.result.length;
+                let gas = Array.from(Array(length), () => new Array(2));
+                let avgPrice=0;
+                let products = 0;
+                
+                for(let i = 0; i<length; i++) {
+                  gas[i][0] = json.result[i].geometry.coordinates[1];
+                  gas[i][1] = json.result[i].geometry.coordinates[0];
+
+                  if(json.result[i].products.length > 0) {
+                    for(let j=0; j<json.result[i].products.length; j++) {
+                      //console.log(json.result[i].products[j].price)
+                      avgPrice+=json.result[i].products[j].price;
+                      products++;
+                    }
+                  }
+                }
+
+                  avgPrice = (avgPrice/products);
+                  //console.log("AVERAGE PRICE"+avgPrice);
+                  carCost=-1;
+                  carCost = Math.round(100 * ((carDistance * (1/gasMileage) * avgPrice) + 5 ))/100;
+                  out11.innerText = "$" + carCost
+                        //console.log("carcost in html"+carCost)
+                })
+
+                // carCost = Math.round(100 * ((carDistance * (1/gasMileage) * avgPrice) + 5 ))/100;
 
                 
                 var bikeUrl = "http://localhost:8000/getbike?x1=" + wp1x + "&y1=" + wp1y + "&x2=" + wp2x + "&y2=" + wp2y;
@@ -371,7 +422,8 @@
                         
                         out9.innerText =  "$0"
                         out10.innerText = "$0"
-                        out11.innerText = "$" + carCost
+                        // out11.innerText = "$" + carCost
+                        // console.log("carcost in html"+carCost)
 
                         out4.innerText = "-"
                         out8.innerText = "-"
