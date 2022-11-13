@@ -15,17 +15,17 @@
   <body>
     
 
-
-    <div id="map" style="width: 100%; height: 40em;"></div>
-    <div class="col ">
-      <input readonly id="lat1">,
-      <input readonly id="lng1">
-      <input readonly id="lat2">,
-      <input readonly id="lng2">
-      <input id="mpg" value="20">mpg</input>
-      <button onClick="go()">Go!</button>
+    <div class="row justify-content-center">
+      <div id="map" style="width: 100%; height: 35em;"></div>
+      <div class="col ">
+        <input readonly id="lat1">,
+        <input readonly id="lng1">
+        <input readonly id="lat2">,
+        <input readonly id="lng2">
+        <input id="mpg" value="20">mpg</input>
+        <button onClick="go()">Go!</button>
+      </div>
     </div>
-
 <div class="row " >
     <div class="col-1">
       <svg id="svg" height="70">
@@ -37,7 +37,7 @@
             cy="50" r="5" fill="orange" stroke="orange"/>
             <circle id="redcircle" cx="35"
             cy="65" r="5" fill="red" stroke="red"/>
-            <text x="30" y="12">Traffic Incidents</text>
+            <text x="30" y="12">Traffic Incident Level</text>
             <text x="45" y="27"> 1</text>
             <text x="45" y="41"> 2</text>
             <text x="45" y="56"> 3</text>
@@ -314,16 +314,16 @@
                 set.forEach(element => {
                   console.log("element: "+element);
                   if(element == 4) {
-                    alert("Traffic Incident: Crash and Hazard")
+                    alert("Traffic Incident Level 4: Crash and Hazard")
                   }
                   if(element == 3) {
-                    alert("Traffic Incident: Congestion")
+                    alert("Traffic Incident Level 3: Congestion")
                   }
                   if(element == 2) {
-                    alert("Traffic Incident: Event")
+                    alert("Traffic Incident Level 2: Event")
                   }
                   if(element == 1) {
-                    alert("Traffic Incident: Construction")
+                    alert("Traffic Incident Level 1: Construction")
                   }
 
                 }
