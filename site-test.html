@@ -214,7 +214,9 @@
             var currentURL = "https://api.iq.inrix.com/findRoute?wp_1=" + wp1x + "%2C" + wp1y + "&wp_2=" + wp2x + "%2C" + wp2y + "&format=json\n"
 
 
-            var incidentURL = "https://incident-api.inrix.com/v1/incidents?box=" + wp1x + "|"+ wp1y +"," + wp2x + "|" + wp2y + "&incidentType=Incidents,Flow,Construction&incidentoutputfields=all\n"
+            //var incidentURL = "https://incident-api.inrix.com/v1/incidents?box=" + wp1x + "|"+ wp1y +"," + wp2x + "|" + wp2y + "&incidentType=Incidents,Flow,Construction&incidentoutputfields=all\n"
+
+            // var incidentURL = "https://api.iq.inrix.com/v1/incidents?box=" + wp1x + "%7C" + wp1y + "%2C" + wp2x + "%7C" + wp2y + "&incidentoutputfields=All&incidenttype=Incidents,Flow,Construction&locale=en"
             
             var myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer " + data.token);
@@ -232,11 +234,35 @@
 
                 carDistance = json.result.trip.routes[0].totalDistance;
                 carTime = json.result.trip.routes[0].travelTimeMinutes;
-                carCost = Math.round(100 * ((carDistance * (1/gasMileage) * 6.016) + 5 ))/100
+                carCost = Math.round(100 * ((carDistance * (1/gasMileage) * 6.016) + 5 ))/100;
                 
                 
+
+                var incidentURL = "https://api.iq.inrix.com/v1/incidents?box=" + wp1x + "%7C" + wp1y + "%2C" + wp2x + "%7C" + wp2y + "&incidentoutputfields=All&incidenttype=Incidents,Flow,Construction,Events&locale=en"
+
+                fetch(incidentURL, requestOptions)
+                .then(response => response.json())
+                .then(json => {
+                    console.log(json)
+                  })
+
+                // let length = data[0].legs[0].steps.length;
+                //        var latlngs = Array.from(Array(length), () => new Array(2));
+
+                //        for(let i = 0; i<length; i++) {
+                //           latlngs[i][0] = data[0].legs[0].steps[i].start_location.lat;
+                //           latlngs[i][1] = data[0].legs[0].steps[i].start_location.lng;
+
+                //         }
+                //         latlngs[length-1][0] = data[0].legs[0].steps[length-1].end_location.lat;
+                //         latlngs[length-1][1] = data[0].legs[0].steps[length-1].end_location.lng;
+
+
+
+
                 
                 var bikeUrl = "http://localhost:8000/getbike?x1=" + wp1x + "&y1=" + wp1y + "&x2=" + wp2x + "&y2=" + wp2y;
+
                 fetch(bikeUrl).then(response => {
                     return response.json();
                 }).then(data => {
@@ -248,7 +274,7 @@
                        var latlngs = Array.from(Array(length), () => new Array(2));
 
                        for(let i = 0; i<length; i++) {
-                          latlngs[i][0] = data[0].legs[0].steps[i].start_location.lat;
+                          latlngs[i][0] = 
                           latlngs[i][1] = data[0].legs[0].steps[i].start_location.lng;
 
                         }
@@ -344,14 +370,8 @@
                                 latlngs[length-1][1] = data[0].legs[0].steps[length-1].end_location.lng;
                                 
                                 var polyline = L.polyline(latlngs, {color: 'purple'}).addTo(map);
-                              }).then(data => {
+                              })
 
-                            fetch(incidentURL, requestOptions)
-                            .then(response => response.json())
-                            .then(json => {
-                                console.log(json)
-                              }
-                              )
                     
 
                             console.log(carDistance);
